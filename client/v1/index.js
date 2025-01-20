@@ -129,6 +129,12 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 🎯 TODO 9: Sort by price for each community
 // 1. For each community, sort the deals by discount price, from highest to lowest
 // 2. Log the sort
+// for (const community in communities) {
+//   if (communities[community]) {
+//       communities[community].sort((a, b) => b.price - a.price);
+//   }
+// }
+// console.log(communities); 
 
 
 // 🎯 TODO 10: Sort by date for each community
