@@ -109,10 +109,27 @@ console.log(MY_FAVORITE_DEALERS[0]);
 //
 // 2. Log the variable
 // 3. Log the number of deals by community
+// const communities = deals.reduce((acc, deal) => {
+//   // Vérifie que "deal" et "deal.community" sont valides
+//   if (deal && deal.community) {
+//       // Si la communauté n'existe pas encore, crée un tableau vide
+//       if (!acc[deal.community]) {
+//           acc[deal.community] = [];
+//       }
+//       // Ajoute le deal à la communauté correspondante
+//       acc[deal.community].push(deal);
+//   }
+//   return acc;
+// }, {});
+
+// console.log(communities);
+
+
 
 // 🎯 TODO 9: Sort by price for each community
 // 1. For each community, sort the deals by discount price, from highest to lowest
 // 2. Log the sort
+
 
 // 🎯 TODO 10: Sort by date for each community
 // 1. For each set, sort the deals by date, from old to recent
