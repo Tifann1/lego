@@ -140,7 +140,12 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 🎯 TODO 10: Sort by date for each community
 // 1. For each set, sort the deals by date, from old to recent
 // 2. Log the sort
-
+// for (const community in communities) {
+//   if (communities[community]) {
+//       communities[community].sort((a, b) => new Date(a.published) - new Date(b.published));
+//   }
+// }
+// console.log(communities);
 
 /**
  * 🧥
