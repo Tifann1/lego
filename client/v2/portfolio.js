@@ -28,6 +28,7 @@ let currentPagination = {};
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
+const selectFilter = document.querySelector('#filters-select');
 const selectSort = document.querySelector('#sort-select');
 const selectLegoSetIds = document.querySelector('#lego-set-id-select');
 const sectionDeals= document.querySelector('#deals');
@@ -81,7 +82,8 @@ const renderDeals = deals => {
       <div class="deal" id=${deal.uuid}>
         <span>${deal.id}</span>
         <a href="${deal.link}">${deal.title}</a>
-        <span>${deal.price}</span>
+        <span>${deal.price}€ -- </span>
+        <span>(-${deal.discount}%)</span>
       </div>
     `;
     })
@@ -158,6 +160,21 @@ const sortDeals = (deals, sortName) => {
   });
 };
 
+const filteredDeals = (deals, filterName) => {
+  deals.filter(deal => {
+    switch (filterName) {
+      case 'discount' : 
+        return deal.discount > 50;
+      case 'commented' : 
+        return deal.comments > 15;
+      case 'hot-deals' : 
+        return deal.temperature > 100;
+      default:
+        return deal;
+    }
+  }
+  )}    
+
 
 /**
  * Declaration of all Listeners
@@ -186,6 +203,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 //Select the page to display
 selectPage.addEventListener('change', async (event) => {
   const deals = await fetchDeals(parseInt(event.target.value), selectShow.value);
+
+  setCurrentDeals(deals);
+  render(currentDeals, currentPagination);
+});
+
+
+// Select the filter
+selectFilter.addEventListener('change', async (event) => {
+  const { result: deals, meta } = await fetchDeals(currentPagination.currentPage, selectShow.value);
+
+  // Applique le filtre sélectionné
+  const filterName = event.target.value;
+  const filtered = filterName === 'all' ? deals : filteredDeals(deals, filterName);
 
   setCurrentDeals(deals);
   render(currentDeals, currentPagination);
