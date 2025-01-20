@@ -83,6 +83,9 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 🎯 TODO 7: Average percentage discount
 // 1. Determine the average percentage discount of the deals
 // 2. Log the average
+// let dealReduceAverage = deals.reduce((sum, deal) => sum + deal.discount, 0) / deals.length;
+// console.log(dealReduceAverage);
+// VM144:2 40.46
 
 /**
  * 🏎
