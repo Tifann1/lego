@@ -76,6 +76,9 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 🎯 TODO 6: Filter a specific percentage discount range
 // 1. Filter the list of deals between 50% and 75%
 // 2. Log the list
+//const deals50Discount75 = deals.filter(a => a.discount > 50 && a.discount < 75);
+
+
 
 // 🎯 TODO 7: Average percentage discount
 // 1. Determine the average percentage discount of the deals
