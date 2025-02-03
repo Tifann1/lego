@@ -28,8 +28,6 @@ let currentPagination = {};
 // instantiate the selectors
 const selectShow = document.querySelector('#show-select');
 const selectPage = document.querySelector('#page-select');
-const selectFilter = document.querySelector('#filters-select');
-const selectSort = document.querySelector('#sort-select');
 const selectLegoSetIds = document.querySelector('#lego-set-id-select');
 const sectionDeals= document.querySelector('#deals');
 const spanNbDeals = document.querySelector('#nbDeals');
@@ -82,8 +80,7 @@ const renderDeals = deals => {
       <div class="deal" id=${deal.uuid}>
         <span>${deal.id}</span>
         <a href="${deal.link}">${deal.title}</a>
-        <span>${deal.price}€ -- </span>
-        <span>(-${deal.discount}%)</span>
+        <span>${deal.price}</span>
       </div>
     `;
     })
@@ -91,7 +88,7 @@ const renderDeals = deals => {
 
   div.innerHTML = template;
   fragment.appendChild(div);
-  sectionDeals.innerHTML = '<h2>DealsNRV</h2>';
+  sectionDeals.innerHTML = '<h2>Deals</h2>';
   sectionDeals.appendChild(fragment);
 };
 
@@ -140,53 +137,9 @@ const render = (deals, pagination) => {
   renderLegoSetIds(deals)
 };
 
-const sortDeals = (deals, sortName) => {
-  return deals.sort((a, b) => {
-    switch (sortName) {
-      case 'price-asc':
-        return a.price - b.price;
-      case 'price-desc':
-        return b.price - a.price;
-      case 'date-asc':
-        return new Date(a.date) - new Date(b.date);
-      case 'date-desc':
-        return new Date(b.date) - new Date(a.date);
-      case 'best-discount':
-        console.log('best discount'); 
-        return b.discount - a.discount;
-      default:
-        return 0;
-    }
-  });
-};
-
-const filteredDeals = (deals, filterName) => {
-  return deals.filter(deal => {
-    switch (filterName) {
-      case 'discount' : 
-        return deal.discount > 50;
-      case 'commented' : 
-        return deal.comments > 15;
-      case 'hot-deals' : 
-        return deal.temperature > 100;
-      default:
-        return deal;
-    }
-  }
-  )};  
-
-
-// const getIdsFromDeals = (deals) => {
-//   return [...new Set(deals.map(deal => deal.id))];
-// };
-
-
-
 /**
  * Declaration of all Listeners
  */
-
-
 
 /**
  * Select the number of deals to display
@@ -204,39 +157,3 @@ document.addEventListener('DOMContentLoaded', async () => {
   setCurrentDeals(deals);
   render(currentDeals, currentPagination);
 });
-
-
-//Select the page to display
-selectPage.addEventListener('change', async (event) => {
-  const deals = await fetchDeals(parseInt(event.target.value), selectShow.value);
-
-  setCurrentDeals(deals);
-  render(currentDeals, currentPagination);
-});
-
-
-// Select the filter
-selectFilter.addEventListener('change', async (event) => {
-  const { result: deals, meta } = await fetchDeals(currentPagination.currentPage, selectShow.value);
-
-  // Applique le filtre sélectionné
-  const filterName = event.target.value;
-  const filtered = filterName === 'all' ? deals : filteredDeals(deals, filterName);
-
-  setCurrentDeals(deals);
-  render(currentDeals, currentPagination);
-});
-
-
-//Select the sort to display
-selectSort.addEventListener('change', async (event) => {
-  const deals = await fetchDeals(currentPagination.currentPage, selectShow.value);
-
-  sortDeals(deals.result, event.target.value);
-  
-  setCurrentDeals(deals);
-  render(currentDeals, currentPagination);
-});
-
-
-
