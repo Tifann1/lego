@@ -148,9 +148,9 @@ const sortDeals = (deals, sortName) => {
       case 'price-desc':
         return b.price - a.price;
       case 'date-asc':
-        return new Date(b.date) - new Date(a.date);
-      case 'date-desc':
         return new Date(a.date) - new Date(b.date);
+      case 'date-desc':
+        return new Date(b.date) - new Date(a.date);
       case 'best-discount':
         console.log('best discount'); 
         return b.discount - a.discount;
@@ -161,7 +161,7 @@ const sortDeals = (deals, sortName) => {
 };
 
 const filteredDeals = (deals, filterName) => {
-  deals.filter(deal => {
+  return deals.filter(deal => {
     switch (filterName) {
       case 'discount' : 
         return deal.discount > 50;
@@ -173,7 +173,13 @@ const filteredDeals = (deals, filterName) => {
         return deal;
     }
   }
-  )}    
+  )};  
+
+
+// const getIdsFromDeals = (deals) => {
+//   return [...new Set(deals.map(deal => deal.id))];
+// };
+
 
 
 /**
