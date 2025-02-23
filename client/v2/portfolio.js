@@ -31,6 +31,13 @@ const selectPage = document.querySelector('#page-select');
 const selectLegoSetIds = document.querySelector('#lego-set-id-select');
 const sectionDeals= document.querySelector('#deals');
 const spanNbDeals = document.querySelector('#nbDeals');
+const errorMessage = document.querySelector('#error-message');
+
+
+// Fonction pour afficher les erreurs
+const showError = (message) => {
+  errorMessage.textContent = message;
+};
 
 /**
  * Set global value
@@ -43,7 +50,7 @@ const setCurrentDeals = ({result, meta}) => {
 };
 
 /**
- * Fetch deals from api
+ * // Fonction pour récupérer les deals
  * @param  {Number}  [page=1] - current page to fetch
  * @param  {Number}  [size=12] - size of the page
  * @return {Object}
@@ -68,7 +75,7 @@ const fetchDeals = async (page = 1, size = 6) => {
 };
 
 /**
- * Render list of deals
+ * Fonction pour afficher les deals
  * @param  {Array} deals
  */
 const renderDeals = deals => {
@@ -107,6 +114,16 @@ const renderPagination = pagination => {
   selectPage.selectedIndex = currentPage - 1;
 };
 
+
+
+
+// // Fonction pour extraire les IDs uniques des sets Lego depuis les deals
+// const getIdsFromDeals = (deals) => {
+//   const ids = new Set(deals.map(deal => deal.id));
+//   return Array.from(ids);
+// };
+
+
 /**
  * Render lego set ids selector
  * @param  {Array} lego set ids
@@ -121,7 +138,7 @@ const renderLegoSetIds = deals => {
 };
 
 /**
- * Render page selector
+ * Fonction pour afficher les indicateurs
  * @param  {Object} pagination
  */
 const renderIndicators = pagination => {
@@ -130,11 +147,12 @@ const renderIndicators = pagination => {
   spanNbDeals.innerHTML = count;
 };
 
+// Fonction principale de rendu
 const render = (deals, pagination) => {
   renderDeals(deals);
   renderPagination(pagination);
+  renderLegoSetIds(deals);
   renderIndicators(pagination);
-  renderLegoSetIds(deals)
 };
 
 /**
@@ -142,7 +160,7 @@ const render = (deals, pagination) => {
  */
 
 /**
- * Select the number of deals to display
+ * Select the NUMBER of DEALS TO DISPLAY
  */
 selectShow.addEventListener('change', async (event) => {
   const deals = await fetchDeals(currentPagination.currentPage, parseInt(event.target.value));
@@ -151,6 +169,19 @@ selectShow.addEventListener('change', async (event) => {
   render(currentDeals, currentPagination);
 });
 
+selectPage.addEventListener('change', (event) => {
+  const newPage = parseInt(event.target.value); // Récupère la page sélectionnée
+  console.log("Nouvelle page sélectionnée :", newPage);
+
+  // Met à jour les données avec la nouvelle page
+  const deals = await fetchDeals(newPage, parseInt(event.target.value));
+
+  // Mets à jour l'affichage
+  renderDeals(newDeals);
+});
+
+
+//Chargement Initial
 document.addEventListener('DOMContentLoaded', async () => {
   const deals = await fetchDeals();
 
