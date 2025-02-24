@@ -147,13 +147,18 @@ const renderIndicators = pagination => {
   spanNbDeals.innerHTML = count;
 };
 
-// Fonction principale de rendu
+
+// Fonction principale RENDU
 const render = (deals, pagination) => {
   renderDeals(deals);
   renderPagination(pagination);
   renderLegoSetIds(deals);
   renderIndicators(pagination);
 };
+
+
+
+
 
 /**
  * Declaration of all Listeners
@@ -169,16 +174,17 @@ selectShow.addEventListener('change', async (event) => {
   render(currentDeals, currentPagination);
 });
 
-selectPage.addEventListener('change', (event) => {
+
+selectPage.addEventListener('change', async (event) => {
   const newPage = parseInt(event.target.value); // Récupère la page sélectionnée
   console.log("Nouvelle page sélectionnée :", newPage);
 
   // Met à jour les données avec la nouvelle page
-  const deals = await fetchDeals(newPage, parseInt(event.target.value));
-
-  // Mets à jour l'affichage
-  renderDeals(newDeals);
+  const deals = await fetchDeals(newPage, selectShow.value);
+  setCurrentDeals(deals);
+  render(currentDeals, currentPagination);
 });
+
 
 
 //Chargement Initial
