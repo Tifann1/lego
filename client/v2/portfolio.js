@@ -32,6 +32,7 @@ const selectLegoSetIds = document.querySelector('#lego-set-id-select');
 const sectionDeals= document.querySelector('#deals');
 const spanNbDeals = document.querySelector('#nbDeals');
 const errorMessage = document.querySelector('#error-message');
+const selectSort = document.querySelector('#sort-select');
 
 
 // Fonction pour afficher les erreurs
@@ -115,13 +116,32 @@ const renderPagination = pagination => {
 };
 
 
+/**
+ * Fonction pour trier les deals selon le critère sélectionné
+ * @param {Array} deals - Liste des deals
+ * @param {String} criterion - Critère de tri ('price-asc', 'price-desc', 'date-asc', 'date-desc')
+ * @returns {Array} - Liste triée des deals
+ */
+const sortDeals = (deals, criterion) => {
+  console.log(deals);
+  return deals.slice().sort((a, b) => {
+    switch (criterion) {
+      case 'price-asc':
+        return a.price - b.price; // Moins cher en premier
+      case 'price-desc':
+        return b.price - a.price; // Plus cher en premier
+      case 'date-asc':
+        return new Date(a.published) - new Date(b.published); // Plus récent en premier
+      case 'date-desc':
+        return new Date(b.published) - new Date(a.published); // Plus ancien en premier
+      default:
+        return 0; // Aucun tri par défaut
+    }
+  });
+};
 
 
-// // Fonction pour extraire les IDs uniques des sets Lego depuis les deals
-// const getIdsFromDeals = (deals) => {
-//   const ids = new Set(deals.map(deal => deal.id));
-//   return Array.from(ids);
-// };
+
 
 
 /**
@@ -150,7 +170,8 @@ const renderIndicators = pagination => {
 
 // Fonction principale RENDU
 const render = (deals, pagination) => {
-  renderDeals(deals);
+  const sortedDeals = sortDeals(deals, selectSort.value); // Trie selon la sélection actuelle
+  renderDeals(sortedDeals);
   renderPagination(pagination);
   renderLegoSetIds(deals);
   renderIndicators(pagination);
@@ -165,7 +186,7 @@ const render = (deals, pagination) => {
  */
 
 /**
- * Select the NUMBER of DEALS TO DISPLAY
+ * NUMBER of DEALS TO DISPLAY
  */
 selectShow.addEventListener('change', async (event) => {
   const deals = await fetchDeals(currentPagination.currentPage, parseInt(event.target.value));
@@ -174,14 +195,23 @@ selectShow.addEventListener('change', async (event) => {
   render(currentDeals, currentPagination);
 });
 
-
+/**
+ * PAGE TO DISPLAY
+ */
 selectPage.addEventListener('change', async (event) => {
   const newPage = parseInt(event.target.value); // Récupère la page sélectionnée
   console.log("Nouvelle page sélectionnée :", newPage);
 
   // Met à jour les données avec la nouvelle page
-  const deals = await fetchDeals(newPage, selectShow.value);
+  const deals = await fetchDeals(newPage, selectShow.value); //prend en compte le nb de deals sur 1 page
   setCurrentDeals(deals);
+  render(currentDeals, currentPagination);
+});
+
+/**
+ * SORT 
+ */
+selectSort.addEventListener('change', () => {
   render(currentDeals, currentPagination);
 });
 
