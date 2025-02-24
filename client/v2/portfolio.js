@@ -35,6 +35,9 @@ const errorMessage = document.querySelector('#error-message');
 const selectSort = document.querySelector('#sort-select');
 
 
+
+
+
 // Fonction pour afficher les erreurs
 const showError = (message) => {
   errorMessage.textContent = message;
@@ -56,11 +59,13 @@ const setCurrentDeals = ({result, meta}) => {
  * @param  {Number}  [size=12] - size of the page
  * @return {Object}
  */
-const fetchDeals = async (page = 1, size = 6) => {
+const fetchDeals = async (page = 1, size = 6, legoSetId = null) => {
   try {
-    const response = await fetch(
-      `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`
-    );
+    const baseUrl = legoSetId 
+    ? `https://lego-api-blue.vercel.app/sales?id=${legoSetId}` 
+    : `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`;
+
+    const response = await fetch(baseUrl);
     const body = await response.json();
 
     if (body.success !== true) {
@@ -68,12 +73,49 @@ const fetchDeals = async (page = 1, size = 6) => {
       return {currentDeals, currentPagination};
     }
 
-    return body.data;
+    console.log(body.data);
+    
+    return legoSetId
+      ? { result: body.data, meta: { currentPage: 1, pageCount: 1, count: body.data.length } } // Ajoute une pagination fictive
+      : body.data;
   } catch (error) {
     console.error(error);
     return {currentDeals, currentPagination};
   }
 };
+
+const fetchDeals2 = async (page = 1, size = 6, legoSetId = null) => {
+  try {
+    const baseUrl = legoSetId
+      ? `https://lego-api-blue.vercel.app/sales?id=${legoSetId}`
+      : `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`;
+
+    const response = await fetch(baseUrl);
+    const body = await response.json();
+
+    if (!body.success) {
+      console.error("Erreur lors de la récupération des données", body);
+      return { result: [], meta: { currentPage: 1, pageCount: 1, count: 0 } }; // Retourne toujours un objet avec `meta`
+    }
+
+    // Ajouter un attribut `meta` pour l'API `/sales`
+    const deals = body.data;
+    console.log("Récupération des deals", deals);
+    if (legoSetId) {
+      console.log("Ajout de la pagination pour `/sales`");
+      return { result: deals, meta: { currentPage: 1, pageCount: 1, count: deals.length } }; // Pas de pagination sur `/sales`
+    }
+
+    return { result: deals, meta: body.data.meta }; // Pour `/deals`, on garde la pagination d'origine
+  } catch (error) {
+    console.error("Erreur réseau", error);
+    return { result: [], meta: { currentPage: 1, pageCount: 1, count: 0 } }; // Retourne un objet avec `meta` même en cas d'erreur
+  }
+};
+
+
+
+
 
 /**
  * Fonction pour afficher les deals
@@ -123,7 +165,6 @@ const renderPagination = pagination => {
  * @returns {Array} - Liste triée des deals
  */
 const sortDeals = (deals, criterion) => {
-  console.log(deals);
   return deals.slice().sort((a, b) => {
     switch (criterion) {
       case 'price-asc':
@@ -169,12 +210,17 @@ const renderIndicators = pagination => {
 
 
 // Fonction principale RENDU
-const render = (deals, pagination) => {
-  const sortedDeals = sortDeals(deals, selectSort.value); // Trie selon la sélection actuelle
+const render = (deals, pagination, byId = false) => {
+
+  if (byId) {
+    renderDeals(deals);
+  } else {
+  const sortedDeals = sortDeals(deals, selectSort.value);
   renderDeals(sortedDeals);
   renderPagination(pagination);
   renderLegoSetIds(deals);
   renderIndicators(pagination);
+  }
 };
 
 
@@ -215,6 +261,23 @@ selectSort.addEventListener('change', () => {
   render(currentDeals, currentPagination);
 });
 
+
+/**
+ * LEGO SET ID
+ */
+selectLegoSetIds.addEventListener('change', async (event) => {
+  const legoSetId = event.target.value;
+  
+  let data;
+  if (legoSetId) {
+    data = await fetchDeals(1, selectShow.value, legoSetId);  
+  } else {
+    data = await fetchDeals(currentPagination.currentPage, selectShow.value);
+  }
+
+  setCurrentDeals(data);
+  render(currentDeals, data.meta); // On passe une pagination correcte
+});
 
 
 //Chargement Initial
