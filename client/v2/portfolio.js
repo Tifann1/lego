@@ -53,8 +53,12 @@ const setCurrentDeals = ({result, meta}) => {
   currentPagination = meta;
 };
 
+
+
+
+
 /**
- * // Fonction pour récupérer les deals
+ * Récupérations des deals DEALABS
  * @param  {Number}  [page=1] - current page to fetch
  * @param  {Number}  [size=12] - size of the page
  * @return {Object}
@@ -101,6 +105,50 @@ const fetchVintedDealsById = async (id) => {
     return [];
   }
 };
+
+
+
+/**
+ * 
+ * @param {Array} deals 
+ * @returns Affichage HTML des indicateurs de prix
+ */
+const renderPriceIndicators = (deals) => {
+  if (deals.length === 0) {
+    document.getElementById("indicators").innerHTML = "Aucune donnée de prix disponible.";
+    return;
+  }
+
+  // Extraction des prix et tri croissant
+  const prices = deals.map(deal => parseFloat(deal.price)).sort((a, b) => a - b);
+
+  console.log("Prix triés :", prices);
+  // Calcul des valeurs
+  const average = prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : 0;
+  const p5 = getPercentile(prices, 5);
+  const p25 = getPercentile(prices, 25);
+  const p50 = getPercentile(prices, 50);
+
+  // Mise à jour du DOM
+  document.getElementById("indicators").innerHTML = `
+    <p>Prix moyen : ${average.toFixed(2)}€</p>
+    <p>P5 : ${p5}€</p>
+    <p>P25 : ${p25}€</p>
+    <p>P50 (médiane) : ${p50}€</p>
+  `;
+};
+
+// Fonction pour récupérer un centile
+const getPercentile = (sortedArray, percentile) => {
+  const index = Math.floor((percentile / 100) * sortedArray.length);
+  return sortedArray[index] || 0; // Si pas de valeur, on retourne 0
+};
+
+
+
+
+
+
 
 
 
@@ -152,7 +200,7 @@ const renderDealsVinted = (deals) => {
 };
 
 /**
- * Render page selector
+ * Render PAGINATION selector
  * @param  {Object} pagination
  */
 const renderPagination = pagination => {
@@ -225,6 +273,7 @@ const render = (deals, pagination, byId = false) => {
     console.log("Rendu par ID");
     // const sortedDeals = sortDeals(deals, selectSort.value);
     // renderDeals(sortedDeals);
+    renderPriceIndicators(deals); 
     renderDealsVinted(deals);
   } else {
   const sortedDeals = sortDeals(deals, selectSort.value);
