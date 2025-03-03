@@ -131,6 +131,7 @@ const renderPriceIndicators = (deals) => {
 
   // Mise à jour du DOM
   document.getElementById("indicators").innerHTML = `
+  <h2>Indicators</h2>
     <p>Prix moyen : ${average.toFixed(2)}€</p>
     <p>P5 : ${p5}€</p>
     <p>P25 : ${p25}€</p>
@@ -143,6 +144,31 @@ const getPercentile = (sortedArray, percentile) => {
   const index = Math.floor((percentile / 100) * sortedArray.length);
   return sortedArray[index] || 0; // Si pas de valeur, on retourne 0
 };
+
+
+const renderLifetimeValue = (deals) => {
+  if (deals.length === 0) {
+    document.getElementById("indicators2").innerHTML = "Aucune donnée disponible.";
+    return;
+  }
+
+  // Extraction et tri des dates
+  const dates = deals.map(deal => new Date(deal.published)).sort((a, b) => a - b);
+
+  const firstDate = dates[0];  // La plus ancienne
+  const lastDate = dates[dates.length - 1]; // La plus récente
+
+  const lifetimeDays = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)); // Différence en jours
+
+  // Mise à jour du DOM
+  document.getElementById("indicators2").innerHTML = `
+  <h2>Indicators2</h2>
+    <p>Première publication : ${firstDate.toLocaleDateString()}</p>
+    <p>Dernière publication : ${lastDate.toLocaleDateString()}</p>
+    <p>Durée de vie du marché: ${lifetimeDays} jours</p>
+  `;
+};
+
 
 
 
@@ -181,7 +207,7 @@ const renderDeals = deals => {
 
 const renderDealsVinted = (deals) => {
   const container = document.getElementById("deals");
-  container.innerHTML = "";
+  container.innerHTML = "<h2>Deals :</h2>";
 
   deals.forEach(deal => {
     const dealElement = document.createElement("div");
@@ -274,6 +300,7 @@ const render = (deals, pagination, byId = false) => {
     // const sortedDeals = sortDeals(deals, selectSort.value);
     // renderDeals(sortedDeals);
     renderPriceIndicators(deals); 
+    renderLifetimeValue(deals);
     renderDealsVinted(deals);
   } else {
   const sortedDeals = sortDeals(deals, selectSort.value);
