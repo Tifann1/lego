@@ -203,7 +203,16 @@ const toggleFavorite = (deal, favoriteButton) => {
   saveFavoritesToLocalStorage(favorites);
 };
 
+const toggleFavoriteFilter = () => {
+  showFavoritesOnly = !showFavoritesOnly; // Inverser l'état du filtre
 
+  // Mettre à jour le texte du bouton
+  const filterButton = document.getElementById("filter-favorites");
+  filterButton.textContent = showFavoritesOnly ? "Afficher tous les deals" : "Afficher les favoris";
+
+  // Ré-rendre les deals avec ou sans filtre
+  renderDealsVinted(currentDeals);
+};
 
 
 
@@ -239,10 +248,18 @@ const renderDeals = deals => {
 };
 
 
+//Filtre AFFICHAGE FAVORIS
+let showFavoritesOnly = false; 
+
+
+/**
+ * Fonction pour afficher les deals
+ * @param  {Array} deals
+ */
 const renderDealsVinted = (deals, sold = false) => {
   const container = document.getElementById("deals");
-  container.innerHTML = ""; // Vide le container
-  
+  const favorites = getFavoritesFromLocalStorage();
+
   // Ajoute un titre seulement si nécessaire
   if (container.children.length === 0) {
     const title = document.createElement("h2");
@@ -250,16 +267,20 @@ const renderDealsVinted = (deals, sold = false) => {
     container.appendChild(title);
   }
 
-  // Récupérer les favoris du localStorage
-  const favorites = getFavoritesFromLocalStorage();
+  // Filtrer les deals pour n'afficher que les favoris si le filtre est activé
+  const dealsToRender = showFavoritesOnly ? deals.filter(deal => 
+    favorites.some(fav => fav.id === deal.id)) : deals;
 
-  deals.forEach(deal => {
+  // Vider l'affichage avant de rendre les deals
+  container.innerHTML = '';
+
+  dealsToRender.forEach(deal => {
     const dealElement = document.createElement("div");
     dealElement.classList.add("deal");
 
     dealElement.innerHTML = `
-      <h3>Deal : ${deal.title}</h3>
-      
+      <h3>Deal :</h3>
+      <p><strong>Nom :</strong> ${deal.title}</p>
       <p><strong>Prix :</strong> ${deal.price}€</p>
       <p><strong>Date :</strong> ${new Date(deal.published).toLocaleDateString()}</p>
       ${sold ? 
@@ -286,6 +307,8 @@ const renderDealsVinted = (deals, sold = false) => {
     container.appendChild(dealElement);
   });
 };
+
+
 
 
 /**
@@ -413,13 +436,19 @@ selectSort.addEventListener('change', () => {
 });
 
 /**
- * FAVORIT BUTTON 
+ * FAVORITE BUTTON 
  */
 const addFavoriteButtonListener = (deal, favoriteButton) => {
   favoriteButton.addEventListener("click", () => {
     toggleFavorite(deal, favoriteButton);
   });
 };
+
+/**
+ * FILTER FAVORITES
+ */ 
+document.getElementById("filter-favorites").addEventListener("click", toggleFavoriteFilter);
+
 
 
 /**
