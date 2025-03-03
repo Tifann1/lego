@@ -59,11 +59,9 @@ const setCurrentDeals = ({result, meta}) => {
  * @param  {Number}  [size=12] - size of the page
  * @return {Object}
  */
-const fetchDeals = async (page = 1, size = 6, legoSetId = null) => {
+const fetchDeals = async (page = 1, size = 6) => {
   try {
-    const baseUrl = legoSetId 
-    ? `https://lego-api-blue.vercel.app/sales?id=${legoSetId}` 
-    : `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`;
+    const baseUrl = `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`;
 
     const response = await fetch(baseUrl);
     const body = await response.json();
@@ -75,41 +73,32 @@ const fetchDeals = async (page = 1, size = 6, legoSetId = null) => {
 
     console.log(body.data);
     
-    return legoSetId
-      ? { result: body.data, meta: { currentPage: 1, pageCount: 1, count: body.data.length } } // Ajoute une pagination fictive
-      : body.data;
+    return body.data;
+
   } catch (error) {
     console.error(error);
     return {currentDeals, currentPagination};
   }
 };
 
-const fetchDeals2 = async (page = 1, size = 6, legoSetId = null) => {
-  try {
-    const baseUrl = legoSetId
-      ? `https://lego-api-blue.vercel.app/sales?id=${legoSetId}`
-      : `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`;
 
+const fetchVintedDealsById = async (id) => {
+  try {
+    const baseUrl = `https://lego-api-blue.vercel.app/sales?id=${id}`;
     const response = await fetch(baseUrl);
     const body = await response.json();
 
-    if (!body.success) {
-      console.error("Erreur lors de la récupération des données", body);
-      return { result: [], meta: { currentPage: 1, pageCount: 1, count: 0 } }; // Retourne toujours un objet avec `meta`
+    //console.log("Réponse complète de l'API :", JSON.stringify(body, null, 2));
+
+    if (!body || !body.data) {
+      console.error("Erreur lors de la récupération des données Vinted", body);
+      return [];
     }
 
-    // Ajouter un attribut `meta` pour l'API `/sales`
-    const deals = body.data;
-    console.log("Récupération des deals", deals);
-    if (legoSetId) {
-      console.log("Ajout de la pagination pour `/sales`");
-      return { result: deals, meta: { currentPage: 1, pageCount: 1, count: deals.length } }; // Pas de pagination sur `/sales`
-    }
-
-    return { result: deals, meta: body.data.meta }; // Pour `/deals`, on garde la pagination d'origine
+    return body.data;
   } catch (error) {
-    console.error("Erreur réseau", error);
-    return { result: [], meta: { currentPage: 1, pageCount: 1, count: 0 } }; // Retourne un objet avec `meta` même en cas d'erreur
+    console.error("Erreur lors du fetch Vinted :", error);
+    return [];
   }
 };
 
@@ -213,6 +202,9 @@ const renderIndicators = pagination => {
 const render = (deals, pagination, byId = false) => {
 
   if (byId) {
+    console.log("Rendu par ID");
+    // const sortedDeals = sortDeals(deals, selectSort.value);
+    // renderDeals(sortedDeals);
     renderDeals(deals);
   } else {
   const sortedDeals = sortDeals(deals, selectSort.value);
@@ -268,21 +260,20 @@ selectSort.addEventListener('change', () => {
 selectLegoSetIds.addEventListener('change', async (event) => {
   const legoSetId = event.target.value;
   
-  let data;
-  if (legoSetId) {
-    data = await fetchDeals(1, selectShow.value, legoSetId);  
-  } else {
-    data = await fetchDeals(currentPagination.currentPage, selectShow.value);
-  }
+  const dealsVinted = await fetchVintedDealsById(legoSetId);
+  console.log(dealsVinted);
 
-  setCurrentDeals(data);
-  render(currentDeals, data.meta); // On passe une pagination correcte
+  currentDeals = dealsVinted.result;
+  
+  console.log(currentDeals);
+  render(currentDeals, null, true);
 });
 
 
 //Chargement Initial
 document.addEventListener('DOMContentLoaded', async () => {
   const deals = await fetchDeals();
+
 
   setCurrentDeals(deals);
   render(currentDeals, currentPagination);
