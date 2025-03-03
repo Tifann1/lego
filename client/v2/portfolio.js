@@ -131,6 +131,26 @@ const renderDeals = deals => {
   sectionDeals.appendChild(fragment);
 };
 
+const renderDealsVinted = (deals) => {
+  const container = document.getElementById("deals");
+  container.innerHTML = "";
+
+  deals.forEach(deal => {
+    const dealElement = document.createElement("div");
+    dealElement.classList.add("deal");
+
+    dealElement.innerHTML = `
+      <h3>Deal :</h3>
+      <p><strong>Nom :</strong> ${deal.title}</p>
+      <p><strong>Prix :</strong> ${deal.price}€</p>
+      <p><strong>Date :</strong> ${new Date(deal.published).toLocaleDateString()}</p>
+      <a href="${deal.link}" target="_blank">Voir l'annonce</a>
+    `;
+
+    container.appendChild(dealElement);
+  });
+};
+
 /**
  * Render page selector
  * @param  {Object} pagination
@@ -205,7 +225,7 @@ const render = (deals, pagination, byId = false) => {
     console.log("Rendu par ID");
     // const sortedDeals = sortDeals(deals, selectSort.value);
     // renderDeals(sortedDeals);
-    renderDeals(deals);
+    renderDealsVinted(deals);
   } else {
   const sortedDeals = sortDeals(deals, selectSort.value);
   renderDeals(sortedDeals);
@@ -258,13 +278,13 @@ selectSort.addEventListener('change', () => {
  * LEGO SET ID
  */
 selectLegoSetIds.addEventListener('change', async (event) => {
-  const legoSetId = event.target.value;
-  
-  const dealsVinted = await fetchVintedDealsById(legoSetId);
-  console.log(dealsVinted);
+  const dealsVinted = await fetchVintedDealsById(event.target.value);
 
   currentDeals = dealsVinted.result;
-  
+
+  //Display number of deals
+  spanNbDeals.innerHTML = currentDeals.length;
+
   console.log(currentDeals);
   render(currentDeals, null, true);
 });
