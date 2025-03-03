@@ -171,6 +171,39 @@ const renderLifetimeValue = (deals) => {
 
 
 
+const getFavoritesFromLocalStorage = () => {
+  // Récupérer les favoris stockés dans localStorage
+  return JSON.parse(localStorage.getItem("favorites")) || [];
+};
+
+const saveFavoritesToLocalStorage = (favorites) => {
+  // Sauvegarder les favoris dans localStorage
+  localStorage.setItem("favorites", JSON.stringify(favorites));
+};
+
+const toggleFavorite = (deal, favoriteButton) => {
+  let favorites = getFavoritesFromLocalStorage();
+
+  // Vérifie si le deal est déjà dans les favoris
+  if (favorites.some(fav => fav.id === deal.id)) {
+    // Retirer le deal des favoris
+    favorites = favorites.filter(fav => fav.id !== deal.id);
+    favoriteButton.textContent = "Ajouter aux favoris";
+    favoriteButton.classList.remove("remove-favorite");
+    favoriteButton.classList.add("add-favorite");
+  } else {
+    // Ajouter le deal aux favoris
+    favorites.push(deal);
+    favoriteButton.textContent = "Retirer des favoris";
+    favoriteButton.classList.remove("add-favorite");
+    favoriteButton.classList.add("remove-favorite");
+  }
+
+  // Sauvegarder les favoris modifiés dans localStorage
+  saveFavoritesToLocalStorage(favorites);
+};
+
+
 
 
 
@@ -205,25 +238,55 @@ const renderDeals = deals => {
   sectionDeals.appendChild(fragment);
 };
 
-const renderDealsVinted = (deals) => {
+
+const renderDealsVinted = (deals, sold = false) => {
   const container = document.getElementById("deals");
-  container.innerHTML = "<h2>Deals :</h2>";
+  container.innerHTML = ""; // Vide le container
+  
+  // Ajoute un titre seulement si nécessaire
+  if (container.children.length === 0) {
+    const title = document.createElement("h2");
+    title.textContent = "Deals :";
+    container.appendChild(title);
+  }
+
+  // Récupérer les favoris du localStorage
+  const favorites = getFavoritesFromLocalStorage();
 
   deals.forEach(deal => {
     const dealElement = document.createElement("div");
     dealElement.classList.add("deal");
 
     dealElement.innerHTML = `
-      <h3>Deal :</h3>
-      <p><strong>Nom :</strong> ${deal.title}</p>
+      <h3>Deal : ${deal.title}</h3>
+      
       <p><strong>Prix :</strong> ${deal.price}€</p>
       <p><strong>Date :</strong> ${new Date(deal.published).toLocaleDateString()}</p>
-      <a href="${deal.link}" target="_blank">Voir l'annonce</a>
+      ${sold ? 
+        `<a href="${deal.link}" target="_blank">Voir l'article VENDU</a>` :
+        `<a href="${deal.link}" target="_blank">Voir l'annonce</a>`
+      }
     `;
 
+    // Crée un bouton "Ajouter aux favoris" ou "Retirer des favoris"
+    const favoriteButton = document.createElement("button");
+    if (favorites.some(fav => fav.id === deal.id)) {
+      favoriteButton.textContent = "Retirer des favoris"; // Si c'est déjà un favori
+      favoriteButton.classList.add("remove-favorite");
+    } else {
+      favoriteButton.textContent = "Ajouter aux favoris"; // Sinon
+      favoriteButton.classList.add("add-favorite");
+    }
+
+    // Ajouter l'event listener pour gérer les favoris
+    addFavoriteButtonListener(deal, favoriteButton);
+
+    // Ajoute le bouton aux deals
+    dealElement.appendChild(favoriteButton);
     container.appendChild(dealElement);
   });
 };
+
 
 /**
  * Render PAGINATION selector
@@ -348,6 +411,15 @@ selectPage.addEventListener('change', async (event) => {
 selectSort.addEventListener('change', () => {
   render(currentDeals, currentPagination);
 });
+
+/**
+ * FAVORIT BUTTON 
+ */
+const addFavoriteButtonListener = (deal, favoriteButton) => {
+  favoriteButton.addEventListener("click", () => {
+    toggleFavorite(deal, favoriteButton);
+  });
+};
 
 
 /**
