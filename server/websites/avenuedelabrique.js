@@ -11,7 +11,7 @@ const parse = data => {
 
   return $('div.prods a')
     .map((i, element) => {
-      const price = parseInt(
+      const price = parseFloat(
         $(element)
           .find('span.prodl-prix span')
           .text()

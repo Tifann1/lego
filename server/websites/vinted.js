@@ -81,7 +81,7 @@ async function fetchVintedItems(searchText, page = 1, perPage = 96) {
 
     if (response.ok) {
         const data = await response.json();
-        console.log("Articles récupérés:", data.items.slice(0, 1));
+        //console.log("Articles récupérés:", data.items.slice(0, 1));
         return data.items;
     } else {
         console.log("Erreur lors de la récupération des articles:", response.status);
