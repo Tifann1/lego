@@ -1,12 +1,18 @@
 const fetch = require('node-fetch');
 const puppeteer = require('puppeteer');
 
+
+
+
+
 const BASE_URL = "https://www.vinted.fr/api/v2/catalog/items";
+
 
 let storedCookies = null;
 
 async function getCookies() {
     // Lance Puppeteer et ouvre un navigateur
+    console.log("Fonction de Récupération des cookie");
     const browser = await puppeteer.launch({ headless: false }); // 'headless: false' pour voir ce que le navigateur fait
     const page = await browser.newPage();
 
@@ -82,26 +88,6 @@ async function fetchVintedItems(searchText, page = 1, perPage = 96) {
     }
 }
 
-// Exemple d'utilisation
-async function fetchVintedItems(searchText, page = 1, perPage = 96) {
-    const url = `https://www.vinted.fr/api/v2/catalog/items?page=${page}&per_page=${perPage}&search_text=${encodeURIComponent(searchText)}`;
-    const options = {
-        method: 'GET',
-        headers: {
-            "User-Agent": "Mozilla/5.0",
-            "Accept": "application/json"
-        }
-    };
-
-    const response = await fetchWithRetry(url, options);
-
-    if (response.ok) {
-        const data = await response.json();
-        console.log("Articles récupérés:", data.items.slice(0, 5));
-    } else {
-        console.log("Erreur lors de la récupération des articles:", response.status);
-    }
-}
 
 // Appel pour récupérer les articles
 fetchVintedItems("lego").catch(console.error);
