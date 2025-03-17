@@ -4,7 +4,6 @@ const puppeteer = require('puppeteer');
 
 
 
-
 const BASE_URL = "https://www.vinted.fr/api/v2/catalog/items";
 
 
@@ -25,10 +24,10 @@ async function getCookies() {
     // Récupère les cookies du navigateur
     const cookies = await page.cookies();
 
-    console.log('Cookies récupérés:', cookies); // Affiche les cookies
+    console.log('Cookies récupérés:')//, cookies); // Affiche les cookies
 
     storedCookies = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
-    console.log('Cookies récupérés et stockés:', storedCookies);
+    //console.log('Cookies récupérés et stockés:', storedCookies);
 
     // Ferme le navigateur
     await browser.close();
@@ -82,15 +81,18 @@ async function fetchVintedItems(searchText, page = 1, perPage = 96) {
 
     if (response.ok) {
         const data = await response.json();
-        console.log("Articles récupérés:", data.items.slice(0, 5));
+        console.log("Articles récupérés:", data.items.slice(0, 1));
+        return data.items;
     } else {
         console.log("Erreur lors de la récupération des articles:", response.status);
     }
 }
 
 
+
+module.exports = fetchVintedItems;
 // Appel pour récupérer les articles
-fetchVintedItems("lego").catch(console.error);
+//fetchVintedItems("lego").catch(console.error);
 
 
 

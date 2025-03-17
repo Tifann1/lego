@@ -8,6 +8,10 @@ const MONGODB_DB_NAME = process.env.MONGODB_DB_NAME;
 
 const client = new MongoClient(MONGODB_URI);
 
+
+const scrapeDealabs = require("./dealabs");
+const fetchVintedItems = require("./vinted");
+
 async function main() {
     try {
         await client.connect();
@@ -17,25 +21,43 @@ async function main() {
         const collection = db.collection('lego');
 
         // Insérer des deals (exemple)
-        const deals = [
-            { setId: 1, name: "Millennium Falcon", price: 129.99, discount: 20, comments: 15, date: new Date("2024-02-20"), scrapedAt: new Date() },
-            { setId: 2, name: "Death Star", price: 499.99, discount: 10, comments: 30, date: new Date("2024-02-25"), scrapedAt: new Date() },
-            { setId: 3, name: "AT-AT", price: 199.99, discount: 25, comments: 5, date: new Date("2024-02-18"), scrapedAt: new Date() },
-            { setId: 4, name: "X-Wing", price: 79.99, discount: 15, comments: 8, date: new Date("2024-02-22"), scrapedAt: new Date() },
-            { setId: 5, name: "Tie Fighter", price: 64.99, discount: 30, comments: 12, date: new Date("2024-02-21"), scrapedAt: new Date("2024-02-10") },
-            { setId: 6, name: "Imperial Star Destroyer", price: 699.99, discount: 5, comments: 50, date: new Date("2024-02-26"), scrapedAt: new Date() },
-        ];
+        // const deals = [
+        //     { setId: 1, name: "Millennium Falcon", price: 129.99, discount: 20, comments: 15, date: new Date("2024-02-20"), scrapedAt: new Date() },
+        //     { setId: 2, name: "Death Star", price: 499.99, discount: 10, comments: 30, date: new Date("2024-02-25"), scrapedAt: new Date() },
+        //     { setId: 3, name: "AT-AT", price: 199.99, discount: 25, comments: 5, date: new Date("2024-02-18"), scrapedAt: new Date() },
+        //     { setId: 4, name: "X-Wing", price: 79.99, discount: 15, comments: 8, date: new Date("2024-02-22"), scrapedAt: new Date() },
+        //     { setId: 5, name: "Tie Fighter", price: 64.99, discount: 30, comments: 12, date: new Date("2024-02-21"), scrapedAt: new Date("2024-02-10") },
+        //     { setId: 6, name: "Imperial Star Destroyer", price: 699.99, discount: 5, comments: 50, date: new Date("2024-02-26"), scrapedAt: new Date() },
+        // ];
 
-        await collection.insertMany(deals);
-        console.log("Deals insérés avec succès : ", await collection.countDocuments());
+        // await collection.deleteMany({});
+        // await collection.insertMany(deals);
+        // console.log("Deals insérés avec succès : ", await collection.countDocuments());
 
+
+
+        const deals = await scrapeDealabs();
+        const sales = await fetchVintedItems();
+
+        console.log("Dans le fichier scrap");
+        console.log("Deals récupérés :", deals.length);
+        console.log("Ventes récupérées :", sales.length);
+
+        // Suppression des anciennes données (si besoin)
+        await collection.deleteMany({});
+
+        // Insertion des nouvelles données
+        await collection.insertMany([...deals, ...sales]);
+        console.log("Données insérées avec succès !");
+
+        
         // Appel des méthodes pour tester
-        console.log("\nBest Discounts : ", await findBestDiscountDeals(db));
-        console.log("\nMost Commented : ", await findMostCommentedDeals(db));
-        console.log("\nSorted by Price : ", await findDealsSortedByPrice(db));
-        console.log("\nSorted by Date : ", await findDealsSortedByDate(db));
-        console.log("\nSales for Set ID 3 : ", await findSalesBySetId(db, 3));
-        console.log("\nSales < 3 weeks : ", await findSalesLessThan3WeeksOld(db));
+        // console.log("\nBest Discounts : ", await findBestDiscountDeals(db));
+        // console.log("\nMost Commented : ", await findMostCommentedDeals(db));
+        // console.log("\nSorted by Price : ", await findDealsSortedByPrice(db));
+        // console.log("\nSorted by Date : ", await findDealsSortedByDate(db));
+        // console.log("\nSales for Set ID 3 : ", await findSalesBySetId(db, 3));
+        // console.log("\nSales < 3 weeks : ", await findSalesLessThan3WeeksOld(db));
 
     } catch (error) {
         console.error("Erreur :", error);
@@ -74,6 +96,5 @@ async function findSalesLessThan3WeeksOld(db) {
     return await db.collection('lego').find({ scrapedAt: { $gte: threeWeeksAgo } }).toArray();
 }
 
-// Lancer le script
 main();
 

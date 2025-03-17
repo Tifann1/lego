@@ -3,6 +3,7 @@ const cheerio = require('cheerio');
 
 const baseUrl = "https://www.dealabs.com";
 
+
 /**
  * Parse webpage data response
  * @param  {String} data - html response
@@ -106,39 +107,65 @@ const parse = data => {
     }).get();
 };
 
+
 /**
  * Scrape a given url page
  * @param {String} url - url to parse
  * @returns {Promise<Object[]>} - List of deals
  */
-module.exports.scrape = async url => {
+// module.exports.scrape = async url => {
+//     const response = await fetch(url, {
+//         headers: {
+//             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+//             "Accept-Language": "fr-FR,fr;q=0.9",
+//             "Referer": "https://www.google.com/",
+//             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+//             "Cache-Control": "no-cache"
+//         }
+//     });
+//     if (response.ok) {
+//         const body = await response.text();
+//         return parse(body);
+//     }
+//     console.error("Error fetching page:", response.status);
+//     return null;
+// };
+
+// module.exports = { scrapeDealabs: scrape };
+
+
+async function scrapeDealabs(url = "https://www.dealabs.com") {
     const response = await fetch(url, {
         headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            "User-Agent": "Mozilla/5.0",
             "Accept-Language": "fr-FR,fr;q=0.9",
             "Referer": "https://www.google.com/",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
             "Cache-Control": "no-cache"
         }
     });
+
     if (response.ok) {
         const body = await response.text();
         return parse(body);
     }
-    console.error("Error fetching page:", response.status);
-    return null;
-};
+
+    console.error("Erreur lors du scrap:", response.status);
+    return [];
+}
+module.exports = scrapeDealabs;
 
 
-(async () => {
-    const url = "https://www.dealabs.com"; 
-    const deals = await module.exports.scrape(url);
-    console.log("📢 Deals scrappés:");
+// Appel pour récupérer les deals
+// (async () => {
+//     const url = "https://www.dealabs.com"; 
+//     const deals = await module.exports.scrape(url);
+//     console.log("📢 Deals scrappés:");
 
-    deals.forEach(deal => {
-        if (deal) {
-            console.log(`- ${deal.id} - ${deal.title} - ${deal.price} - ${deal.temperature}° - ${deal.category.name}`);
-        }
-    });})();
+//     deals.forEach(deal => {
+//         if (deal) {
+//             console.log(`- ${deal.id} - ${deal.title} - ${deal.price} - ${deal.temperature}° - ${deal.category.name}`);
+//         }
+//     });})();
 
 
