@@ -20,111 +20,65 @@ app.get('/', (request, response) => {
 
 app.listen(PORT);
 
-console.log(`📡 Running on port ${PORT}`);
+console.log(`Running on port ${PORT}`);
 
 
-
-//Connexion a Mongo 
-require('dotenv').config(); // Charge les variables d'environnement
-console.log("MONGODB_URI:", process.env.MONGODB_URI);
 
 const { MongoClient } = require('mongodb');
+require('dotenv').config(); // Charger les variables d'environnement
 
 const MONGODB_URI = process.env.MONGODB_URI;
 const DB_NAME = process.env.MONGODB_DB_NAME;
 
-const client = new MongoClient(MONGODB_URI);
+let client;
 
-
-
-
-//Fonctions de trie
-async function findBestDiscountDeals(db) {
-  return await db.collection('deals').find().sort({ discount: -1 }).toArray();
-}
-
-async function findMostCommentedDeals(db) {
-  return await db.collection('deals').find().sort({ comments: -1 }).toArray();
-}
-
-async function findDealsSortedByPrice(db) {
-  return await db.collection('deals').find().sort({ price: 1 }).toArray();
-}
-
-async function findDealsSortedByDate(db) {
-  return await db.collection('deals').find().sort({ date: -1 }).toArray();
-}
-
-async function findSalesBySetId(db, setId) {
-  return await db.collection('sales').find({ setId: setId }).toArray();
-}
-
-async function findSalesLessThan3WeeksOld(db) {
-  const threeWeeksAgo = new Date();
-  threeWeeksAgo.setDate(threeWeeksAgo.getDate() - 21);
-  return await db.collection('sales').find({ scrapedAt: { $gte: threeWeeksAgo } }).toArray();
+async function getMongoClient() {
+    if (!client) {
+        client = new MongoClient(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+        await client.connect(); // Connexion unique et réutilisable
+    }
+    return client;
 }
 
 
 
 
-
-
-//ENDPOINTS
-const deals = [
-  {
-      "_id": "9f778cb0-19f5-59d7-8e2a-4d945627d43e",
-      "link": "https://www.dealabs.com/bons-plans/lego-harry-potter-le-chateau-et-le-domaine-de-poudlard-76419-via-3498-sur-la-carte-fidelite-3014312",
-      "retail": 139.9,
-      "price": 104.92,
-      "discount": 25,
-      "temperature": 159.27,
-      "photo": "https://static-pepper.dealabs.com/threads/raw/atFEj/3014312_1/re/300x300/qt/60/3014312_1.jpg",
-      "comments": 4,
-      "published": 1741307146,
-      "title": "Jeu de construction Lego Harry Potter - Le Château et le Domaine de Poudlard 76419",
-      "id": "76419",
-      "community": "dealabs"
-  }
-];
+//Endpoints 
 
 app.get('/deals/search', async (req, res) => {
-  const client = new MongoClient(MONGODB_URI);
-  try {
-      await client.connect();
-      const db = client.db(DB_NAME);
-      let query = {};
-      let sort = {};
+    try {
+        const mongoClient = await getMongoClient(); // Obtenir la connexion persistante
+        const db = mongoClient.db(DB_NAME);
 
-      // Filtres optionnels
-      if (req.query.price) {
-          query.price = { $lte: parseFloat(req.query.price) };  // Prix max
-      }
-      if (req.query.date) {
-          const fromDate = new Date(req.query.date);
-          query.date = { $gte: fromDate };  // Deals publiés après cette date
-      }
-      if (req.query.filterBy === "best-discount") {
-          sort.discount = -1;
-      } else if (req.query.filterBy === "most-commented") {
-          sort.comments = -1;
-      } else if (req.query.filterBy === "cheapest") {
-          sort.price = 1;
-      }
+        let query = {};
+        let sort = {};
 
-      const limit = parseInt(req.query.limit) || 12;
+        // Filtres optionnels
+        if (req.query.price) {
+            query.price = { $lte: parseFloat(req.query.price) };  // Prix max
+        }
+        if (req.query.date) {
+            const fromDate = new Date(req.query.date);
+            query.date = { $gte: fromDate };  // Deals publiés après cette date
+        }
+        if (req.query.filterBy === "best-discount") {
+            sort.discount = -1;
+        } else if (req.query.filterBy === "most-commented") {
+            sort.comments = -1;
+        } else if (req.query.filterBy === "cheapest") {
+            sort.price = 1;
+        }
 
-      const deals = await db.collection('deals').find(query).sort(sort).limit(limit).toArray();
-      res.json(deals);
+        const limit = parseInt(req.query.limit) || 12;
 
-  } catch (error) {
-      console.error("Erreur MongoDB :", error);
-      res.status(500).json({ error: "Internal Server Error" });
-  } finally {
-      await client.close();
-  }
+        const deals = await db.collection('deals').find(query).sort(sort).limit(limit).toArray();
+        res.json(deals);
+
+    } catch (error) {
+        console.error("Erreur MongoDB :", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
 });
-
 
 
 
@@ -156,8 +110,6 @@ app.get('/sales/search', async (req, res) => {
 
 
 
-
-
 app.get('/deals/:id', (req, res) => {
   const deal = deals.find(d => d.id === req.params.id);
   
@@ -165,5 +117,72 @@ app.get('/deals/:id', (req, res) => {
       res.json(deal);
   } else {
       res.status(404).json({ error: "Deal not found" });
+  }
+});
+
+
+
+
+//Endpoint TEST CONNEXION MONGO
+app.get('/test-db-connection', async (req, res) => {
+  const client = new MongoClient(MONGODB_URI);
+  try {
+      console.log("Connexion à MongoDB...");
+      await client.connect();
+      res.json({ message: "Connexion à MongoDB réussie" });
+  } catch (error) {
+      console.error("Erreur de connexion MongoDB :", error);
+      res.status(500).json({ error: "Erreur de connexion MongoDB" });
+  } finally {
+      await client.close();
+  }
+});
+
+app.get('/check-deals-count', async (req, res) => {
+  const client = new MongoClient(MONGODB_URI);
+  try {
+      await client.connect();
+      const db = client.db(DB_NAME);
+      const count = await db.collection('deals').countDocuments();
+      console.log("Nombre de documents dans deals :", count);
+      res.json({ count });
+  } catch (error) {
+      console.error("Erreur de requête MongoDB :", error);
+      res.status(500).json({ error: "Erreur de requête MongoDB" });
+  } finally {
+      await client.close();
+  }
+});
+
+
+app.get('/test-deals-query', async (req, res) => {
+  const client = new MongoClient(MONGODB_URI);
+  try {
+      await client.connect();
+      const db = client.db(DB_NAME);
+      const top5Deals = await db.collection('deals').find({}).limit(5).toArray();
+      console.log("Top 5 deals récupérés :", top5Deals);
+      res.json(top5Deals);
+  } catch (error) {
+      console.error("Erreur de requête MongoDB :", error);
+      res.status(500).json({ error: "Erreur de requête MongoDB" });
+  } finally {
+      await client.close();
+  }
+});
+
+app.get('/test-sales-query', async (req, res) => {
+  const client = new MongoClient(MONGODB_URI);
+  try {
+      await client.connect();
+      const db = client.db(DB_NAME);
+      const top5Deals = await db.collection('sales').find({}).limit(5).toArray();
+      console.log("Top 5 sales récupérés :", top5Deals);
+      res.json(top5Deals);
+  } catch (error) {
+      console.error("Erreur de requête MongoDB :", error);
+      res.status(500).json({ error: "Erreur de requête MongoDB" });
+  } finally {
+      await client.close();
   }
 });
