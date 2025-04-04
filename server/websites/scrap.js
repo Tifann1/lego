@@ -18,7 +18,8 @@ async function main() {
         console.log("Connexion réussie à MongoDB");
 
         const db = client.db(MONGODB_DB_NAME);
-        const collection = db.collection('lego');
+        const collectionDeals = db.collection('deals');
+        const collectionSales = db.collection('sales');
 
         // Insérer des deals (exemple)
         // const deals = [
@@ -44,10 +45,13 @@ async function main() {
         console.log("Ventes récupérées :", sales.length);
 
         // Suppression des anciennes données (si besoin)
-        await collection.deleteMany({});
+        await collectionDeals.deleteMany({});
+        await collectionSales.deleteMany({});
+        console.log("Anciennes données supprimées avec succès !");
 
         // Insertion des nouvelles données
-        await collection.insertMany([...deals, ...sales]);
+        await collectionDeals.insertMany([...deals]);
+        await collectionSales.insertMany([...sales]);
         console.log("Données insérées avec succès !");
 
         
