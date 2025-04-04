@@ -65,7 +65,8 @@ const setCurrentDeals = ({result, meta}) => {
  */
 const fetchDeals = async (page = 1, size = 6) => {
   try {
-    const baseUrl = `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`;
+    //const baseUrl = `https://lego-api-blue.vercel.app/deals?page=${page}&size=${size}`;
+    const baseUrl = `https://lego-bsfldyviq-tifanns-projects.vercel.app/deals?page=${page}&size=${size}`;
 
     const response = await fetch(baseUrl);
     const body = await response.json();
@@ -88,7 +89,9 @@ const fetchDeals = async (page = 1, size = 6) => {
 
 const fetchVintedDealsById = async (id) => {
   try {
-    const baseUrl = `https://lego-api-blue.vercel.app/sales?id=${id}`;
+    //const baseUrl = `https://lego-api-blue.vercel.app/sales?id=${id}`;
+    const baseUrl = `https://lego-bsfldyviq-tifanns-projects.vercel.app/sales?id=${id}`;
+    
     const response = await fetch(baseUrl);
     const body = await response.json();
 
