@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deals & Sales</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <h1>Deals (Dealabs) & Sales (Vinted)</h1>
+
+  <div class="filters">
+    <div class="filter-section">
+      <h3>Filtres Deals</h3>
+      <label>Prix :
+        <input type="range" id="priceMin" />
+        <input type="range" id="priceMax" />
+        <span id="priceRangeLabel"></span>
+      </label>
+      <label>Température :
+        <input type="range" id="tempMin" />
+        <input type="range" id="tempMax" />
+        <span id="tempRangeLabel"></span>
+      </label>
+      <button id="resetFilters">Réinitialiser les filtres</button>
+
+      <details>
+        <summary>Choisir les fournisseurs</summary>
+        <div id="merchantFilter" style="margin-top: 10px;"></div>
+      </details>
+      <label>Tri :
+        <select id="dealSort">
+          <option value="">Aucun</option>
+          <option value="price">Prix</option>
+          <option value="temperature">Température</option>
+          <option value="merchant">Fournisseur</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="filter-section">
+      <h3>Recherche Ventes</h3>
+      <input type="text" id="saleSearch" placeholder="Rechercher une vente..." />
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="box">
+      <h2>Deals</h2>
+      <ul id="deals-list">Chargement...</ul>
+    </div>
+    <div class="box">
+      <h2>Sales</h2>
+      <ul id="sales-list">Chargement...</ul>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 'use strict';
 
-const API_BASE_URL = 'https://lego-1hx7m0he7-tifanns-projects.vercel.app';
+const API_BASE_URL = 'https://lego-k462x38nh-tifanns-projects.vercel.app';
 
 /**
  * Fetch deals from the API
@@ -63,11 +63,16 @@ const renderSales = (sales) => {
   container.innerHTML = sales.map(sale => `
     <div class="sale">
       <h3>${sale.title}</h3>
-      <p>Prix: ${sale.price}€</p>
-      <a href="${sale.link}" target="_blank">Voir l'article vendu</a>
+      <p>Prix: ${sale.price.amount} ${sale.price.currency_code}</p>
+      <div class="photos">
+        ${sale.photos.map(photo => `<img src="${photo.url}" alt="${sale.title}" />`).join('')}
+      </div>
+      <p>Nombre de vues: ${sale.view_count}</p>
+      <a href="${sale.url}" target="_blank">Voir la vente</a>
     </div>
   `).join('');
 };
+
 
 
 /**

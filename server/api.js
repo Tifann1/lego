@@ -149,6 +149,43 @@ app.get('/update-deals', async (req, res) => {
 });
 
 
+app.get('/update-sales/:searchText', async (req, res) => {
+    try {
+        const mongoClient = await getMongoClient(); 
+        const db = mongoClient.db(DB_NAME); 
+
+        const collectionSales = db.collection('sales');
+
+        const { searchText } = req.params;  // Récupère le texte de recherche depuis l'URL
+        console.log("Recherche Vinted pour :", searchText);
+
+        // Appel à la fonction fetchVintedItems
+        const fetchVintedItems = require("./websites/vinted.js");
+        const vintedItems = await fetchVintedItems(searchText);
+
+        // Vérification si des résultats ont été récupérés
+        if (vintedItems && vintedItems.length > 0) {
+            console.log(`Articles trouvés pour "${searchText}":`, vintedItems.length);
+            res.status(200).json({ success: true, items: vintedItems });
+        } else {
+            console.log(`Aucun article trouvé pour "${searchText}"`);
+            res.status(404).json({ success: false, message: `Aucun article trouvé pour "${searchText}"` });
+        }
+
+        // Insertion des nouvelles données
+        await collectionSales.insertMany([...vintedItems]);
+        console.log("Sales insérées avec succès !");
+        res.status(200).json({ success: true, message: 'Sales mis à jour avec succès' });
+
+    } catch (error) {
+        console.error("Erreur dans /update-sales :", error);
+        res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour des ventes' });
+    }
+});
+
+
+
+
 
 
 

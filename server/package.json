@@ -6,6 +6,7 @@
   "repository": "git@github.com:92bondstreet/lego.git",
   "dependencies": {
     "cheerio": "^1.0.0",
+    "chrome-aws-lambda": "^10.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -14,6 +15,7 @@
     "node-fetch": "^2.7.0",
     "parse-domain": "^8.2.2",
     "puppeteer": "^24.4.0",
+    "puppeteer-core": "^10.4.0",
     "require-all": "^3.0.0",
     "uuid": "^11.0.5"
   },
