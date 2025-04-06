@@ -73,7 +73,9 @@ const parse = data => {
                 };
         
                 // 🖼️ Image principale
-                const image = thread.mainImage ? `https://static.dealabs.com/${thread.mainImage.path}` : null;
+                const image = thread.mainImage
+                    ? `https://static-pepper.dealabs.com/${thread.mainImage.path.startsWith('threads/raw/') ? thread.mainImage.path : 'threads/raw/' + thread.mainImage.path}/${thread.mainImage.name}/re/404x404/qt/50/${thread.mainImage.name}.jpg`
+                    : null;
         
                 // 🎯 Objet final pour stockage
                 const deal = {

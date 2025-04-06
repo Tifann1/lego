@@ -1,6 +1,6 @@
 'use strict';
 
-const API_BASE_URL = 'https://lego-ki20kta5j-tifanns-projects.vercel.app';
+const API_BASE_URL = 'https://lego-1hx7m0he7-tifanns-projects.vercel.app';
 
 /**
  * Fetch deals from the API
@@ -23,7 +23,7 @@ const fetchDeals = async () => {
 const fetchSales = async () => {
   try {
     console.log('Fetching sales...');
-    const response = await fetch('https://lego-ki20kta5j-tifanns-projects.vercel.app/sales/search')//(`${API_BASE_URL}/sales/search`);
+    const response = await fetch(`${API_BASE_URL}/sales/search`);
     const data = await response.json();
     return data;
   } catch (error) {
@@ -38,14 +38,21 @@ const fetchSales = async () => {
 const renderDeals = (deals) => {
   const container = document.getElementById('deals-list');
   console.log('Rendering deals:', deals);
+
   container.innerHTML = deals.map(deal => `
-    <div class="deal">
+    <li>
+      ${deal.image ? `<img src="${deal.image}" alt="Image du deal" style="max-width: 100%; height: auto;"/>` : ''}
       <h3>${deal.title}</h3>
-      <p>Prix: ${deal.price}€</p>
-      <a href="${deal.link}" target="_blank">Voir l'annonce</a>
-    </div>
+      <p><strong>Prix :</strong> ${deal.price}€</p>
+      <p><strong>Température :</strong> ${deal.temperature}°</p>
+      ${deal.merchant?.merchantName ? `<p><strong>Fournisseur :</strong> ${deal.merchant.merchantName}</p>` : ''}
+      ${deal.nextBestPrice ? `<p><strong>Prochain meilleur prix :</strong> ${deal.nextBestPrice}€</p>` : ''}
+      <a href="${deal.dealLink}" target="_blank">👉 Voir l'annonce</a>
+    </li>
   `).join('');
 };
+
+
 
 /**
  * Render sales
@@ -68,7 +75,7 @@ const renderSales = (sales) => {
  */
 async function updateDealsBeforeFetch() {
   try {
-    const response = await fetch('/api/update-deals');
+    const response = await fetch(`${API_BASE_URL}/update-deals`);
     const result = await response.json();
     if (result.success) {
       console.log('Deals mis à jour !');
