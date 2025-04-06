@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Deals vs Sales</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <section id="deals-section">
+      <h2>🛍️ Deals</h2>
+      <div class="filters">
+        <div>
+          <label>Prix: <span id="priceRangeLabel"></span></label>
+          <input type="range" id="priceMin">
+          <input type="range" id="priceMax">
+        </div>
+        <div>
+          <label>Température: <span id="tempRangeLabel"></span></label>
+          <input type="range" id="tempMin">
+          <input type="range" id="tempMax">
+        </div>
+        <div id="merchantFilter"></div>
+        <div>
+          <select id="dealSort">
+            <option value="">Trier par…</option>
+            <option value="price">Prix</option>
+            <option value="temperature">Température</option>
+            <option value="merchant">Fournisseur</option>
+          </select>
+          <button id="resetFilters">Reset</button>
+        </div>
+      </div>
+      <ul id="deals-list"></ul>
+    </section>
+
+    <section id="sales-section">
+      <h2>💸 Sales</h2>
+      <input type="text" id="saleSearch" placeholder="Rechercher une vente…" />
+      <ul id="sales-list"></ul>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

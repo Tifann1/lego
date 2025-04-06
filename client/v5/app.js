@@ -43,33 +43,35 @@ const renderDeals = (deals) => {
 
 const renderSales = (sales) => {
   const container = document.getElementById('sales-list');
-  container.innerHTML = sales.map(sale => `
-    <li class="sale">
-    ${sale.photo != null ? 
-        `<img src="${photo.url}" alt="${sale.title}" />` : 
-        `<div style="width:100px;height:100px;background:#ccc;border-radius:8px;"></div>`
-      }
-      <div>
-        <h3>${sale.title}</h3>
-        <p>Prix: ${sale.price.amount} ${sale.price.currency_code}</p>
-        <a href="${sale.url}" target="_blank">Voir la vente</a>
-      </div>
-    </li>`).join('');
+  container.innerHTML = sales.map(sale => {
+    const image = sale.photo?.url || '';
+    return `
+      <li>
+        ${image ? `<img src="${image}" alt="${sale.title}" />` : `<div style="width:100px;height:100px;background:#ccc;"></div>`}
+        <div>
+          <h3>${sale.title}</h3>
+          <p>Prix: ${sale.price.amount} ${sale.price.currency_code}</p>
+          <a href="${sale.url}" target="_blank">Voir la vente</a>
+        </div>
+      </li>`;
+  }).join('');
 };
 
 const setupFilters = () => {
-  const minPrice = Math.min(...allDeals.map(d => d.price));
-  const maxPrice = Math.max(...allDeals.map(d => d.price));
-  const minTemp = Math.min(...allDeals.map(d => d.temperature));
-  const maxTemp = Math.max(...allDeals.map(d => d.temperature));
-
   const priceMinInput = document.getElementById('priceMin');
   const priceMaxInput = document.getElementById('priceMax');
   const tempMinInput = document.getElementById('tempMin');
   const tempMaxInput = document.getElementById('tempMax');
 
-  priceMinInput.min = tempMinInput.min = minPrice;
-  priceMaxInput.max = tempMaxInput.max = maxPrice;
+  const minPrice = Math.min(...allDeals.map(d => d.price));
+  const maxPrice = Math.max(...allDeals.map(d => d.price));
+  const minTemp = Math.min(...allDeals.map(d => d.temperature));
+  const maxTemp = Math.max(...allDeals.map(d => d.temperature));
+
+  priceMinInput.min = minPrice;
+  priceMaxInput.max = maxPrice;
+  tempMinInput.min = minTemp;
+  tempMaxInput.max = maxTemp;
 
   priceMinInput.value = minPrice;
   priceMaxInput.value = maxPrice;
@@ -101,7 +103,8 @@ const setupFilters = () => {
     renderDeals(filtered);
   };
 
-  [priceMinInput, priceMaxInput, tempMinInput, tempMaxInput, document.getElementById('dealSort')].forEach(input => input.addEventListener('input', updateFilters));
+  [priceMinInput, priceMaxInput, tempMinInput, tempMaxInput, document.getElementById('dealSort')]
+    .forEach(input => input.addEventListener('input', updateFilters));
   document.getElementById('merchantFilter').addEventListener('change', updateFilters);
   document.getElementById('resetFilters').addEventListener('click', () => {
     priceMinInput.value = minPrice;
@@ -126,8 +129,9 @@ const setupSaleSearch = () => {
   const input = document.getElementById('saleSearch');
   input.addEventListener('input', () => {
     const search = input.value.toLowerCase();
-    const filtered = allSales.filter(s => s.title.toLowerCase().includes(search));
-    filtered.sort((a, b) => a.price.amount - b.price.amount);
+    const filtered = allSales
+      .filter(s => s.title.toLowerCase().includes(search))
+      .sort((a, b) => a.price.amount - b.price.amount);
     renderSales(filtered);
   });
 };

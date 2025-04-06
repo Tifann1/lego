@@ -1,55 +1,56 @@
 body {
     font-family: Arial, sans-serif;
     margin: 20px;
-    background-color: #f0f4f8;
-    color: #1e2a38;
-  }
-  
-  h1 {
+    background-color: #222222; /* Fond sombre */
+    color: #169976; /* Texte principal */
+}
+
+h1 {
     text-align: center;
-    color: #333;
-    margin: 10px 0; /* ← Réduit la hauteur */
-    font-size: 24px; /* ← Un peu plus petit */
-  }
-  
-  .container {
+    color: #1DCD9F; /* Couleur verte claire */
+    margin: 10px 0;
+    font-size: 24px;
+}
+
+.container {
     display: flex;
     gap: 20px;
     margin-top: 20px;
-  }
-  
-  .box {
+}
+
+.box {
     flex: 1;
-    border: 1px solid #ccc;
+    border: 1px solid #1DCD9F; /* Bordure verte claire */
     padding: 10px;
-    background-color: #909090;
+    background-color: #169976; /* Fond vert foncé */
     border-radius: 10px;
     overflow-y: auto;
     max-height: 80vh;
-  }
+}
 
-  h1, h2, h3 {
-    color: #2b4a6f;
-  }
-  
-  input, select {
+h1, h2, h3 {
+    color: #1DCD9F; /* Couleur verte claire */
+}
+
+input, select {
     border: 1px solid #a0b0c0;
     border-radius: 4px;
     padding: 5px;
-  }
-  
-  ul {
+}
+
+ul {
     list-style: none;
     padding: 0;
-  }
-  
-  li {
+}
+
+li {
     display: flex;
     gap: 10px;
     margin-bottom: 15px;
     border-bottom: 1px solid #ddd;
     padding-bottom: 10px;
-  }
+}
+
   
   li img {
     width: 100px;
@@ -74,6 +75,12 @@ body {
   .filter-section label {
     font-size: 14px;
   }
+
+  .filter-section input {
+    width: 100%;
+    padding: 10px;  /* Ajoute un peu de padding pour que le texte ne touche pas les bords */
+    box-sizing: border-box;  /* Pour inclure le padding et la bordure dans la largeur totale */
+  }
   
   .sale img {
     max-width: 100px;
@@ -85,4 +92,6 @@ body {
   input[type="range"] {
     width: 100%;
   }
+
+
   
