@@ -62,13 +62,32 @@ const renderSales = (sales) => {
   `).join('');
 };
 
+
+/**
+ * UPDATE DEALS
+ */
+async function updateDealsBeforeFetch() {
+  try {
+    const response = await fetch('/api/update-deals');
+    const result = await response.json();
+    if (result.success) {
+      console.log('Deals mis à jour !');
+    } else {
+      console.error('Erreur lors de l actualisation :', result.message);
+    }
+  } catch (error) {
+    console.error('Erreur réseau update-deals :', error);
+  }
+}
+
 /**
  * Initialize the app
  */
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('App initialized');
-  const deals = await fetchDeals();
-  const sales = await fetchSales();
-  renderDeals(deals);
-  renderSales(sales);
+    await updateDealsBeforeFetch();
+    const deals = await fetchDeals();
+    const sales = await fetchSales();
+    renderDeals(deals);
+    renderSales(sales);
 });
