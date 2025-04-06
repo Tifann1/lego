@@ -121,6 +121,35 @@ app.get('/deals/:id', (req, res) => {
 });
 
 
+app.get('/update-deals', async (req, res) => {
+    try {
+        const scrapeDealabs = require("./websites/dealabs.js");
+        const mongoClient = await getMongoClient(); 
+        const db = mongoClient.db(DB_NAME); 
+
+        const collectionDeals = db.collection('deals');
+        const deals = await scrapeDealabs();
+
+        console.log("Dans le fichier scrap");
+        console.log("Deals récupérés :", deals.length);
+
+        // Suppression des anciennes données (si besoin)
+        await collectionDeals.deleteMany({});
+        console.log("Anciennes données supprimées avec succès !");
+
+        // Insertion des nouvelles données
+        await collectionDeals.insertMany([...deals]);
+        console.log("Données insérées avec succès !");
+
+        res.status(200).json({ success: true, message: 'Deals mis à jour avec succès' });
+    } catch (error) {
+        console.error("Erreur dans /update-deals :", error);
+        res.status(500).json({ success: false, message: 'Erreur lors de la mise à jour des deals' });
+    }
+});
+
+
+
 
 
 //Endpoint TEST CONNEXION MONGO

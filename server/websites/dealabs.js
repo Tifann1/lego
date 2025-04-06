@@ -134,7 +134,7 @@ const parse = data => {
 // module.exports = { scrapeDealabs: scrape };
 
 
-async function scrapeDealabs(url = "https://www.dealabs.com") {
+async function scrapeDealabs(url = "https://www.dealabs.com/search?q=lego") {
     const response = await fetch(url, {
         headers: {
             "User-Agent": "Mozilla/5.0",
